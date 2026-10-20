@@ -46,5 +46,10 @@ text — keep node labels short and readable.
 ## Before replying
 - Every resource the page loads follows the rules above (scripts pinned and from the allowed
   CDNs; Google Fonts is the only stylesheet host).
-- It parses: `python3 -c "import html.parser,sys; html.parser.HTMLParser().feed(open(sys.argv[1]).read())" <file>`.
+- Run `python3 ${CLAUDE_SKILL_DIR}/scripts/check-page.py <file>` once. It renders desktop and
+  phone widths in light and dark and lists overflow, console errors, failed loads, unrendered
+  Mermaid, an inert dark theme and low-contrast text. Fix what it lists in one pass; don't loop
+  on re-checks. Exit 2 means Playwright isn't installed — skip, and say so in one line.
+- Screenshots (`--shots <dir>`) only when the user asks or for evals; have a subagent look at
+  them rather than reading images into the main conversation.
 - Size is reasonable (no large embedded data URIs without a reason).
