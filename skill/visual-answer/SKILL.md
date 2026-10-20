@@ -84,12 +84,14 @@ visual anchor (a coloured name line, a key number, a chip row). Use a multi-pane
 only for a page meant to be scanned at a glance (a status dashboard); never split a story into
 a grid of small panels. Inside a section, side-by-side blocks are fine when they compare.
 
-Diagrams: Mermaid in `<pre class="mermaid">…</pre>` (an Artifact renders it natively — never load
-a Mermaid library there; an HTML file pre-renders it to SVG as `references/standalone.md` shows). Never
-hand-draw diagram SVG. Draw one only when a relationship is the point and a
-sentence can't carry it; ≤ ~15 nodes; labels short. In an Artifact, leave Mermaid on its default
-theme (it follows light/dark); in an HTML file, the snippet in `references/standalone.md` picks
-the theme. Add `classDef` colours only if they read on both backgrounds.
+Diagrams: Mermaid in `<pre class="mermaid">…</pre>` (an Artifact renders it natively — never
+load a Mermaid library there; an HTML file pre-renders it to SVG as `references/standalone.md`
+shows). Never hand-draw diagram SVG. Draw one only when a relationship is the point and a
+sentence can't carry it; ≤ ~15 nodes. A diagram shows structure: each relationship drawn once,
+details written on the thing they describe, related things grouped. Labels are short plain text
+(a URL in a label makes Mermaid drop it). In an Artifact, leave Mermaid on its default theme (it
+follows light/dark); in an HTML file, `render-mermaid.py` takes the diagram's colours and font
+from the page. Add `classDef` colours only if they read on both backgrounds.
 
 ## 4. Design emphasis (applies on top of the base design guidance: quickstart, or standalone.md)
 

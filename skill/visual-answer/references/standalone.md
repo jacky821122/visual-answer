@@ -4,9 +4,9 @@ Use when there is no Artifact tool in this session, or the user asks for a file.
 design guidance quickstart would give; SKILL.md sections 2–6 still apply on top.
 
 ## Delivery
-- One self-contained `.html` file named `YYYY-MM-DD-<slug>.html`. Folder, first match wins:
-  a location the user names; the "HTML files go to" line in `reader.local.md`;
-  `~/visual-answer-pages/`. Create the folder if needed.
+- One self-contained `.html` file named `YYYY-MM-DD-<slug>.html`. Folder, first match wins: a
+  location (folder or full file path) the user names; the "HTML files go to" line in
+  `reader.local.md`; `~/visual-answer-pages/`. Create the folder if needed.
 - Revisions overwrite the same path.
 - Terminal reply: the core takeaway and the absolute path. Don't try to open a browser.
 
@@ -91,11 +91,12 @@ following the system):
 ```
 
 Then run `python3 ${CLAUDE_SKILL_DIR}/scripts/render-mermaid.py <file>`. It replaces each block
-with inline SVG (a light and a dark copy, switched by CSS), keeps the source inside the figure,
-and drops the loader — so diagrams show with no JavaScript or network, including iOS file
-previews. After editing a diagram's source, run it again. Exit 2 (no Playwright) leaves the
-loader in place: diagrams then render in a browser but not in previews or offline, so keep
-node labels short and readable as plain text.
+with inline SVG (a light and a dark copy, switched by CSS, coloured from the page's body
+background, body text colour, `--accent` — or the first heading's colour — and body font), keeps
+the source inside the figure, and drops the loader — so diagrams show with no JavaScript or
+network, including iOS file previews. After editing a diagram's source, run it again. Exit 2 (no
+Playwright) leaves the loader in place: diagrams then render in a browser but not in previews or
+offline, so keep node labels short and readable as plain text.
 Prefer top-down layouts (`flowchart TD`): a wide left-to-right chart has to scroll sideways on a
 phone.
 
@@ -108,8 +109,9 @@ phone.
 - After `render-mermaid.py`, run `python3 ${CLAUDE_SKILL_DIR}/scripts/check-page.py <file>`
   once. It renders desktop and phone widths in light and dark and lists overflow, console
   errors, failed loads, unrendered Mermaid, an inert dark theme, low-contrast text and loads
-  that break the rules above. Fix what it lists in one pass; don't loop on re-checks. Exit 2
-  means Playwright isn't installed — skip, and say so in one line.
+  that break the rules above. Fix what it lists in one pass; don't loop on re-checks — whatever
+  remains after that pass stays, mentioned in the reply only if it hurts reading. Exit 2 means
+  Playwright isn't installed — skip, and say so in one line.
 - Screenshots (`--shots <dir>`) only when the user asks or for evals; have a subagent look at
   them rather than reading images into the main conversation.
 - Size is reasonable (no large embedded data URIs without a reason).

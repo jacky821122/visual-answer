@@ -7,7 +7,8 @@ Each <pre class="mermaid"> block becomes a <figure class="va-diagram"> holding a
 and a dark SVG (CSS shows the one matching the system theme) plus the source in an inert
 <script type="text/x-mermaid">, so the script can be run again after edits. The Mermaid
 loader script is removed: the page then needs no JavaScript or network to show diagrams
-(iOS file previews, offline viewing). On narrow screens a wide diagram scrolls
+(iOS file previews, offline viewing). Diagram colours and font come from the page
+itself (background, text, --accent or the heading colour) for each theme. On narrow screens a wide diagram scrolls
 sideways rather than shrinking its labels below ~12px.
 Exit 0 = done (or nothing to do), 1 = a diagram failed, 2 = Playwright not available.
 """
@@ -31,10 +32,39 @@ STYLE = ('<style id="va-diagram-style">.va-diagram{margin:1.5rem 0;overflow-x:au
          '@media (prefers-color-scheme: dark){.va-diagram .va-light{display:none}'
          '.va-diagram .va-dark{display:block}}</style>')
 
+# Reads the page's own colours and font so diagrams look like part of the page rather
+# than Mermaid's stock lavender. Accent = --accent if defined, else the first heading colour.
+PALETTE = """
+() => {
+  const toRgb = c => { const m = (c || '').match(/[\\d.]+/g); return m ? m.slice(0, 3).map(Number) : null; };
+  const probe = document.createElement('i');
+  document.body.appendChild(probe);
+  const resolve = c => { probe.style.color = ''; probe.style.color = c; return toRgb(getComputedStyle(probe).color); };
+  const root = getComputedStyle(document.documentElement), body = getComputedStyle(document.body);
+  let bg = toRgb(body.backgroundColor);
+  if (!bg || /rgba\\(.*, 0\\)/.test(body.backgroundColor)) bg = toRgb(root.backgroundColor) || [255, 255, 255];
+  const fg = toRgb(body.color) || [0, 0, 0];
+  const v = root.getPropertyValue('--accent').trim();
+  const h = document.querySelector('h2, h1');
+  const accent = (v && resolve(v)) || (h && toRgb(getComputedStyle(h).color)) || fg;
+  probe.remove();
+  const mix = (a, b, t) => a.map((x, i) => Math.round(x * t + b[i] * (1 - t)));
+  const hex = c => '#' + c.map(x => x.toString(16).padStart(2, '0')).join('');
+  return {
+    background: hex(bg), mainBkg: hex(mix(accent, bg, 0.12)), primaryColor: hex(mix(accent, bg, 0.12)),
+    primaryBorderColor: hex(mix(accent, bg, 0.7)), primaryTextColor: hex(fg), textColor: hex(fg),
+    nodeTextColor: hex(fg), lineColor: hex(mix(fg, bg, 0.55)), clusterBkg: hex(mix(fg, bg, 0.04)),
+    clusterBorder: hex(mix(fg, bg, 0.2)), titleColor: hex(fg), edgeLabelBackground: hex(bg),
+    fontFamily: body.fontFamily, fontSize: '15px',
+  };
+}
+"""
+
 RENDER = """
-async ([src, theme, id]) => {
+async ([src, vars, id]) => {
   const { default: mermaid } = await import('%s');
-  mermaid.initialize({ startOnLoad: false, theme, htmlLabels: false, flowchart: { htmlLabels: false } });
+  mermaid.initialize({ startOnLoad: false, theme: 'base', themeVariables: vars,
+                       htmlLabels: false, flowchart: { htmlLabels: false } });
   const { svg } = await mermaid.render(id, src);
   return svg;
 }
@@ -72,12 +102,19 @@ def main():
     out, pos, failed = [], 0, 0
     with sync_playwright() as p:
         browser = p.chromium.launch()
+        palette = {}
+        for scheme in ("light", "dark"):
+            ctx = browser.new_context(color_scheme=scheme)
+            probe = ctx.new_page()
+            probe.goto(path.as_uri())
+            palette[scheme] = probe.evaluate(PALETTE)
+            ctx.close()
         page = browser.new_page()
         page.set_content("<!doctype html><html><body></body></html>")
         for i, ((start, end), src) in enumerate(blocks):
             try:
-                light = legible(page.evaluate(RENDER, [src, "default", f"va-m{i}-light"]))
-                dark = legible(page.evaluate(RENDER, [src, "dark", f"va-m{i}-dark"]))
+                light = legible(page.evaluate(RENDER, [src, palette["light"], f"va-m{i}-light"]))
+                dark = legible(page.evaluate(RENDER, [src, palette["dark"], f"va-m{i}-dark"]))
             except Exception as e:  # keep the original block so nothing is lost
                 failed += 1
                 print(f"diagram {i + 1}: render failed: {str(e).splitlines()[0][:160]}")
