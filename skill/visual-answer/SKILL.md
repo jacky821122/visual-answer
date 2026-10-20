@@ -42,7 +42,10 @@ Arguments: `$ARGUMENTS`
      `quickstart` first (`intent: "other"`) and use the design guidance it returns — it stands in
      for `artifact-design`, so don't load that skill as well. Always build a plain HTML page,
      even if quickstart offers a Docs or Slides type. Load `dataviz` only if there is a chart.
-     Publish with the Artifact tool; title = a short name for the subject.
+     Before publishing, look at the page once: `ArtifactCheck` if this session has it, else the
+     Artifact tool's preview action if it offers one, else `scripts/check-page.py` on the local
+     file (see `references/standalone.md`); if none exists, skip. Fix what the look shows in one
+     pass, then publish with the Artifact tool; title = a short name for the subject.
    - **HTML file** (no Artifact tool, or the user asked for a file): read
      `references/standalone.md` and follow it for delivery and the design baseline.
    Either way, apply section 4 of this file on top.
