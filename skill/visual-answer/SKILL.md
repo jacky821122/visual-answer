@@ -85,7 +85,7 @@ only for a page meant to be scanned at a glance (a status dashboard); never spli
 a grid of small panels. Inside a section, side-by-side blocks are fine when they compare.
 
 Diagrams: Mermaid in `<pre class="mermaid">…</pre>` (an Artifact renders it natively — never load
-a Mermaid library there; an HTML file loads it as `references/standalone.md` shows). Never
+a Mermaid library there; an HTML file pre-renders it to SVG as `references/standalone.md` shows). Never
 hand-draw diagram SVG. Draw one only when a relationship is the point and a
 sentence can't carry it; ≤ ~15 nodes; labels short. In an Artifact, leave Mermaid on its default
 theme (it follows light/dark); in an HTML file, the snippet in `references/standalone.md` picks

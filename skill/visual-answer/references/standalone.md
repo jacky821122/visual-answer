@@ -79,7 +79,8 @@ shorthand that wipes the side gutter; a flex child with long text missing `min-w
 labels that don't sit on the chart's own scale or use colours that vanish in one theme.
 
 ## Diagrams
-Mermaid from a pinned ESM build, theme following the system:
+Write Mermaid as `<pre class="mermaid">` blocks with this loader (pinned ESM build, theme
+following the system):
 
 ```html
 <script type="module">
@@ -89,8 +90,14 @@ Mermaid from a pinned ESM build, theme following the system:
 </script>
 ```
 
-The theme is chosen once at load; that is enough. Offline, the diagram source shows as plain
-text — keep node labels short and readable.
+Then run `python3 ${CLAUDE_SKILL_DIR}/scripts/render-mermaid.py <file>`. It replaces each block
+with inline SVG (a light and a dark copy, switched by CSS), keeps the source inside the figure,
+and drops the loader — so diagrams show with no JavaScript or network, including iOS file
+previews. After editing a diagram's source, run it again. Exit 2 (no Playwright) leaves the
+loader in place: diagrams then render in a browser but not in previews or offline, so keep
+node labels short and readable as plain text.
+Prefer top-down layouts (`flowchart TD`): a wide left-to-right chart has to scroll sideways on a
+phone.
 
 ## Charts
 - Simple bars, meters and sparklines: inline SVG or CSS, coloured with the page's semantic tokens.
@@ -98,11 +105,11 @@ text — keep node labels short and readable.
 - Use the `dataviz` skill if this environment has it; otherwise follow SKILL.md section 4.
 
 ## Before replying
-- Run `python3 ${CLAUDE_SKILL_DIR}/scripts/check-page.py <file>` once. It renders desktop and
-  phone widths in light and dark and lists overflow, console errors, failed loads, unrendered
-  Mermaid, an inert dark theme, low-contrast text and loads that break the rules above. Fix
-  what it lists in one pass; don't loop on re-checks. Exit 2 means Playwright isn't
-  installed — skip, and say so in one line.
+- After `render-mermaid.py`, run `python3 ${CLAUDE_SKILL_DIR}/scripts/check-page.py <file>`
+  once. It renders desktop and phone widths in light and dark and lists overflow, console
+  errors, failed loads, unrendered Mermaid, an inert dark theme, low-contrast text and loads
+  that break the rules above. Fix what it lists in one pass; don't loop on re-checks. Exit 2
+  means Playwright isn't installed — skip, and say so in one line.
 - Screenshots (`--shots <dir>`) only when the user asks or for evals; have a subagent look at
   them rather than reading images into the main conversation.
 - Size is reasonable (no large embedded data URIs without a reason).
