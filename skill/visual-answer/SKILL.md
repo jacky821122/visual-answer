@@ -43,8 +43,8 @@ Arguments: `$ARGUMENTS`
      for `artifact-design`, so don't load that skill as well. Always build a plain HTML page,
      even if quickstart offers a Docs or Slides type. Load `dataviz` only if there is a chart.
      Before publishing, look at the page once: `ArtifactCheck` if this session has it, else the
-     Artifact tool's preview action if it offers one, else `scripts/check-page.py` on the local
-     file (see `references/standalone.md`); if none exists, skip. Fix what the look shows in one
+     Artifact tool's preview action if it offers one, else `scripts/check-page.py --artifact` on the
+     local file (see `references/standalone.md`); if none exists, skip. Fix what the look shows in one
      pass, then publish with the Artifact tool; title = a short name for the subject.
    - **HTML file** (no Artifact tool, or the user asked for a file): read
      `references/standalone.md` and follow it for delivery and the design baseline.
@@ -103,8 +103,9 @@ insight, so push further:
   an accent colour, sized well above the body text.
 - **Chips and states.** Status and flags are filled chips with text (✓ 已完成, ! 注意) on a tinted
   background. Values past a meaningful limit change colour.
-- **Callouts that stand out.** Tinted background + coloured edge or icon-free label; one style per
-  meaning (insight, warning, action). Use as many as the content genuinely has.
+- **Callouts that stand out.** Tinted background + an icon-free label, or a coloured edge on a
+  square-cornered block (a stripe down a rounded card reads as stock); one style per meaning
+  (insight, warning, action). Use as many as the content genuinely has.
 - **A subject-specific voice in type.** A display face or eyebrow line that fits the subject's
   world; body text stays highly readable.
 - **Charts use the same semantic colours.** A category has one colour in its chart, chips and

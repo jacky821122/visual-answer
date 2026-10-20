@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """Render a standalone page and report layout/theme problems as text.
 
-Usage: check-page.py PAGE.html [--shots DIR]
+Usage: check-page.py PAGE.html [--shots DIR] [--artifact]
 
 Renders desktop (1280px) and phone (375px) widths in light and dark, then lists:
 horizontal overflow, console/page errors, failed loads, Mermaid blocks that did
-not render, a dark theme that changes nothing, and low-contrast text.
+not render, a dark theme that changes nothing, low-contrast text, and loads that
+break the standalone loading rules (allowed hosts, exact versions).
+--artifact: the page is an Artifact source file; the host renders its Mermaid,
+so unrendered Mermaid and standalone loading rules are not reported.
 Exit 0 = clean, 1 = issues found, 2 = Playwright not available.
 """
 import argparse
 import pathlib
+import re
 import sys
+from urllib.parse import urlparse
 
 try:
     from playwright.sync_api import sync_playwright
@@ -19,6 +24,22 @@ except ImportError:
     sys.exit(2)
 
 VIEWPORTS = {"desktop": (1280, 900), "phone": (375, 800)}
+SCRIPT_HOSTS = {"cdn.jsdelivr.net", "cdnjs.cloudflare.com"}
+FONT_HOSTS = {"fonts.googleapis.com", "fonts.gstatic.com"}
+
+
+def load_rule_problem(url):
+    """Why a loaded URL breaks standalone.md's loading rules, or None."""
+    u = urlparse(url)
+    if u.scheme in ("file", "data", "blob", "about"):
+        return None
+    if u.hostname in FONT_HOSTS:
+        return None
+    if u.hostname not in SCRIPT_HOSTS:
+        return "host not allowed"
+    if not re.search(r"@\d+\.\d+\.\d+|/\d+\.\d+\.\d+/", u.path):
+        return "no exact version"
+    return None
 
 # Runs in the page: overflow offenders, Mermaid state, body colours, low-contrast text.
 PROBE = """
@@ -73,6 +94,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("page")
     ap.add_argument("--shots", help="write full-page screenshots to this folder")
+    ap.add_argument("--artifact", action="store_true", help="skip the Mermaid check (host renders it)")
     args = ap.parse_args()
     page_path = pathlib.Path(args.page).resolve()
     if not page_path.exists():
@@ -95,6 +117,8 @@ def main():
                 page.on("console", lambda m: m.type == "error" and errors.append(m.text))
                 page.on("pageerror", lambda e: errors.append(str(e)))
                 page.on("requestfailed", lambda r: failed.append(r.url))
+                page.on("request", lambda r: not args.artifact and load_rule_problem(r.url) and errors.append(
+                    f"LOADRULE {load_rule_problem(r.url)}: {r.url}"))
                 page.goto(page_path.as_uri(), wait_until="networkidle", timeout=20000)
                 page.wait_for_timeout(800)  # let Mermaid finish
                 r = page.evaluate(PROBE)
@@ -102,11 +126,13 @@ def main():
                 if r["overflow"]:
                     issues.append(f"horizontal overflow from " + ", ".join(r["overflow"]))
                 bad = [s for s in r["mermaid"] if s != "ok"]
-                if bad:
+                if bad and not args.artifact:
                     issues.append(f"{len(bad)}/{len(r['mermaid'])} Mermaid blocks {bad[0]}")
                 if r["lowCount"]:
                     issues.append(f"{r['lowCount']} low-contrast text elements, e.g. " + "; ".join(r["low"]))
-                for e in errors[:3]:
+                for e in [e for e in errors if e.startswith("LOADRULE ")]:
+                    issues.append("load rule: " + e[9:160])
+                for e in [e for e in errors if not e.startswith("LOADRULE ")][:3]:
                     issues.append(f"console error: {e[:160]}")
                 for u in failed[:3]:
                     issues.append(f"failed to load {u}")
