@@ -3,7 +3,8 @@
 A Claude Code skill that turns an answer into a well-designed page — explanations, recaps,
 diagnoses, comparisons and data reports — only when explicitly asked. It publishes a claude.ai
 Artifact when that tool is available, and otherwise writes a self-contained HTML file
-(`~/visual-answer-pages/`), so it also works without claude.ai.
+(default `~/visual-answer-pages/`, configurable in the reader profile), so it also works
+without claude.ai.
 
 It is a content layer: it decides page type, structure and which components (prose, Mermaid
 diagram, table, chart, callout) earn their place. Base visual design comes from the Artifact

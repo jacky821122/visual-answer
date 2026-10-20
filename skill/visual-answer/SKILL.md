@@ -70,6 +70,9 @@ Arguments: `$ARGUMENTS`
   up only if it would flip a conclusion, and then it sits next to the item it affects.
 - **Full lookup tables are folded** (`<details>`) unless looking things up is the page's job.
 - **Cut** what the reader profile lists as unwanted, even if it took effort to find.
+- **Except the subject itself.** A cut rule yields when the item is what the question is about:
+  the error code the user is asking about can be the headline; a rejected option they asked
+  "why not" about is the topic, not a footnote.
 
 ## 3. Layout
 

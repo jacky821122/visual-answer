@@ -29,10 +29,14 @@ judgement, not a checklist to fill.
 - Raw source vocabulary: API field names, match scores, internal class names, exit codes.
 - Data-quality and methodology detail that does not change the conclusion.
 - In recaps and explanations: rejected alternatives and why (the agent can remember them;
-  mention one only if they will ask). Compare pages are exempt — there the options are the topic.
+  mention one only if they will ask). Exempt: compare pages, and any page where the user asked
+  why an option was dropped — there the options are the topic.
 - Token/time spent, dead ends hit along the way.
 - Comparison with how others do it — only when the page's topic is a comparison.
 - Per-criterion verification evidence. One line of "verified how" is enough unless asked.
+
+## Delivery
+- HTML files go to: (optional — a folder path on this machine; leave as is for the default)
 
 ## When unsure
 If you can't tell whether they'd care about something, don't put it in the main flow. Either

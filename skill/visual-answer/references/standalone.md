@@ -4,8 +4,9 @@ Use when there is no Artifact tool in this session, or the user asks for a file.
 design guidance quickstart would give; SKILL.md sections 2–6 still apply on top.
 
 ## Delivery
-- One self-contained `.html` file. Default path `~/visual-answer-pages/YYYY-MM-DD-<slug>.html`
-  (create the folder if needed); a location the user names wins.
+- One self-contained `.html` file named `YYYY-MM-DD-<slug>.html`. Folder, first match wins:
+  a location the user names; the "HTML files go to" line in `reader.local.md`;
+  `~/visual-answer-pages/`. Create the folder if needed.
 - Revisions overwrite the same path.
 - Terminal reply: the core takeaway and the absolute path. Don't try to open a browser.
 
