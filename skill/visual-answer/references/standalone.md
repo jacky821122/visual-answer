@@ -1,0 +1,49 @@
+# standalone — deliver a self-contained HTML file
+
+Use when there is no Artifact tool in this session, or the user asks for a file. It replaces the
+design guidance quickstart would give; SKILL.md sections 2–6 still apply on top.
+
+## Delivery
+- One self-contained `.html` file. Default path `~/visual-answer-pages/YYYY-MM-DD-<slug>.html`
+  (create the folder if needed); a location the user names wins.
+- Revisions overwrite the same path.
+- Terminal reply: the core takeaway and the absolute path. Don't try to open a browser.
+
+## Baseline
+- `<!doctype html>`, `<meta charset="utf-8">`, viewport meta, a `<title>` that is a short name
+  for the subject.
+- Colour tokens on `:root`; a dark set under `@media (prefers-color-scheme: dark)`; `body` gets
+  an explicit background and text colour from the tokens. Design both themes.
+- System font stack for body text; one Google Font for display type is optional (a
+  `fonts.googleapis.com` stylesheet link — it has no version to pin, and that is fine).
+- One reading column, max ~860px, 16px side gutter; no horizontal scroll at phone width (wide
+  tables scroll inside their own wrapper).
+- Everything inline (CSS, SVG, data). External scripts only from `cdn.jsdelivr.net/npm/` or
+  `cdnjs.cloudflare.com`, always with an exact version, never `@latest` or a bare major.
+  These rules cover what the page loads (`<script src>`, `import`, `<link href>`), not URLs
+  shown to the reader as text.
+
+## Diagrams
+Mermaid from a pinned ESM build, theme following the system:
+
+```html
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default' });
+</script>
+```
+
+The theme is chosen once at load; that is enough. Offline, the diagram source shows as plain
+text — keep node labels short and readable.
+
+## Charts
+- Simple bars, meters and sparklines: inline SVG or CSS, coloured with the page's semantic tokens.
+- Chart.js only when interaction or many series earn it (`chart.js@4.4.1` from jsDelivr).
+- Use the `dataviz` skill if this environment has it; otherwise follow SKILL.md section 4.
+
+## Before replying
+- Every resource the page loads follows the rules above (scripts pinned and from the allowed
+  CDNs; Google Fonts is the only stylesheet host).
+- It parses: `python3 -c "import html.parser,sys; html.parser.HTMLParser().feed(open(sys.argv[1]).read())" <file>`.
+- Size is reasonable (no large embedded data URIs without a reason).

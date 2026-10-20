@@ -1,16 +1,17 @@
 ---
 name: visual-answer
 description: >-
-  Turn an answer into a well-designed claude.ai Artifact page instead of a long terminal reply:
+  Turn an answer into a well-designed page — a claude.ai Artifact, or a standalone HTML file
+  where Artifacts aren't available — instead of a long terminal reply:
   deep explanations, technical principles, long write-ups, data visualisation, ops diagnosis,
   option comparisons, and recaps of what an agent just did. Use ONLY when the user explicitly
   asks for it: invokes /visual-answer, or says things like "做成頁面", "用 HTML 回答", "畫圖說明",
-  "視覺化", "做成 artifact 給我看", "看不懂，畫出來", "make it a page", "visualize this",
+  "視覺化", "做成 artifact 給我看", "給我 html 檔", "看不懂，畫出來", "make it a page", "visualize this",
   "recap what you did as a page". Never use it on your own initiative for a normal reply.
 argument-hint: "[topic or what to recap]"
 ---
 
-# visual-answer: answer with one Artifact page
+# visual-answer: answer with one page
 
 The user decided a page is wanted. The hard part is not the HTML; it is **deciding what this
 reader should see**. A page that shows everything you know is a failed page. A page that shows
@@ -24,7 +25,8 @@ Arguments: `$ARGUMENTS`
    (the user's own profile; fall back to `references/reader.md` if it does not exist). Then write down
    for yourself, in 3 lines: what the reader wants to learn or decide from this page; the
    so-what (what it means for them / what to do); what they will NOT care about. Everything
-   after this step serves those lines.
+   after this step serves those lines. If `reader.local.md` does not exist yet, follow
+   `references/setup.md` first (one question; a light pass, then back to the request).
 2. **Pick the page type** (table below) and read its reference. Types are starting points, not
    forms: the reference gives principles and examples, never a list of sections you must fill.
 3. **Gather real material** — files, command output, data, this session. Never invent facts.
@@ -35,13 +37,17 @@ Arguments: `$ARGUMENTS`
 5. **Outline** — only sections that serve step 1. For each, ask "would the reader miss this?"
    Content you're unsure about goes to a closing 「可能有興趣」 `<details>`, or becomes a one-line
    question in the terminal reply.
-6. **Build**: run the Artifact tool's `quickstart` first (`intent: "other"`) and use the design
-   guidance it returns — it stands in for `artifact-design`, so don't load that skill as well.
-   Always build a plain HTML page, even if quickstart offers a Docs or Slides type. Load
-   `dataviz` only if there is a chart. Then apply section 4 of this file on top.
-7. **Publish** with the Artifact tool. Title = a short name for the subject.
-8. **Terminal reply**: 1–3 lines — the core takeaway and the link, plus at most one question
-   about content you left out. Don't paste page content.
+6. **Build and deliver** — pick the delivery first:
+   - **Artifact** (the Artifact tool exists and the user didn't ask for a file): run its
+     `quickstart` first (`intent: "other"`) and use the design guidance it returns — it stands in
+     for `artifact-design`, so don't load that skill as well. Always build a plain HTML page,
+     even if quickstart offers a Docs or Slides type. Load `dataviz` only if there is a chart.
+     Publish with the Artifact tool; title = a short name for the subject.
+   - **HTML file** (no Artifact tool, or the user asked for a file): read
+     `references/standalone.md` and follow it for delivery and the design baseline.
+   Either way, apply section 4 of this file on top.
+7. **Terminal reply**: 1–3 lines — the core takeaway and the link or file path, plus at most one
+   question about content you left out. Don't paste page content.
 
 | Type | Use when | Reference |
 |---|---|---|
@@ -72,12 +78,14 @@ visual anchor (a coloured name line, a key number, a chip row). Use a multi-pane
 only for a page meant to be scanned at a glance (a status dashboard); never split a story into
 a grid of small panels. Inside a section, side-by-side blocks are fine when they compare.
 
-Diagrams: Mermaid in `<pre class="mermaid">…</pre>` (rendered natively; never load a Mermaid
-library, never hand-draw diagram SVG). Draw one only when a relationship is the point and a
-sentence can't carry it; ≤ ~15 nodes; labels short. Leave Mermaid on its default theme (it
-follows light/dark); add `classDef` colours only if they read on both backgrounds.
+Diagrams: Mermaid in `<pre class="mermaid">…</pre>` (an Artifact renders it natively — never load
+a Mermaid library there; an HTML file loads it as `references/standalone.md` shows). Never
+hand-draw diagram SVG. Draw one only when a relationship is the point and a
+sentence can't carry it; ≤ ~15 nodes; labels short. In an Artifact, leave Mermaid on its default
+theme (it follows light/dark); in an HTML file, the snippet in `references/standalone.md` picks
+the theme. Add `classDef` colours only if they read on both backgrounds.
 
-## 4. Design emphasis (applies on top of the quickstart design guidance)
+## 4. Design emphasis (applies on top of the base design guidance: quickstart, or standalone.md)
 
 The default design guidance leans utilitarian for reports and docs. These pages are read for pleasure and
 insight, so push further:
@@ -121,7 +129,7 @@ insight, so push further:
 ## 7. Updating
 
 Revise by editing the same local file and publishing the same path (same URL); for an earlier
-session's page use the Artifact tool's `url` flow.
+session's page use the Artifact tool's `url` flow. An HTML file is revised in place at its path.
 
 When the user asks for more or less of something, revise this page first. If the feedback looks
 like a lasting preference rather than a one-off for this page, ask in one line whether to record

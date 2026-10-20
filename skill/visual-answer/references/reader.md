@@ -2,7 +2,7 @@
 
 > Template. Copy to `reader.local.md` (git-ignored) and personalise it there; the skill reads
 > `reader.local.md` when it exists and falls back to this file. The preferences below are
-> sensible defaults, not a description of you.
+> sensible defaults, not a description of you. `setup.md` describes a quick way to create it.
 
 The default reader is the user. This file describes what they tend to care about. It is a
 living profile: when their feedback on a page ("這個我不需要", "這個好") looks like a lasting
