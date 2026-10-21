@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# /// script
+# dependencies = ["playwright"]
+# ///
 """Render a standalone page and report layout/theme problems as text.
 
 Usage: check-page.py PAGE.html [--shots DIR] [--artifact]
@@ -10,8 +13,10 @@ break the standalone loading rules (allowed hosts, exact versions).
 --artifact: the page is an Artifact source file; the host renders its Mermaid,
 so unrendered Mermaid and standalone loading rules are not reported.
 Exit 0 = clean, 1 = issues found, 2 = Playwright not available.
+PLAYWRIGHT_CHROMIUM=<browser binary> uses that browser instead of Playwright's own build.
 """
 import argparse
+import os
 import pathlib
 import re
 import sys
@@ -106,7 +111,7 @@ def main():
 
     found, colours = {}, {}  # message -> renders it appeared in
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM") or None)
         for scheme in ("light", "dark"):
             for name, (w, h) in VIEWPORTS.items():
                 tag = f"{name}/{scheme}"

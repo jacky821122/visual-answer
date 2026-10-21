@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# /// script
+# dependencies = ["playwright"]
+# ///
 """Pre-render a page's Mermaid diagrams into inline SVG, in place.
 
 Usage: render-mermaid.py PAGE.html
@@ -11,8 +14,10 @@ loader script is removed: the page then needs no JavaScript or network to show d
 itself (background, text, --accent or the heading colour) for each theme. On narrow screens a wide diagram scrolls
 sideways rather than shrinking its labels below ~12px.
 Exit 0 = done (or nothing to do), 1 = a diagram failed, 2 = Playwright not available.
+PLAYWRIGHT_CHROMIUM=<browser binary> uses that browser instead of Playwright's own build.
 """
 import html
+import os
 import pathlib
 import re
 import sys
@@ -101,7 +106,7 @@ def main():
 
     out, pos, failed = [], 0, 0
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = p.chromium.launch(executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM") or None)
         palette = {}
         for scheme in ("light", "dark"):
             ctx = browser.new_context(color_scheme=scheme)

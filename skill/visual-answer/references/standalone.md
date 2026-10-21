@@ -90,7 +90,8 @@ following the system):
 </script>
 ```
 
-Then run `python3 ${CLAUDE_SKILL_DIR}/scripts/render-mermaid.py <file>`. It replaces each block
+Then run `uv run ${CLAUDE_SKILL_DIR}/scripts/render-mermaid.py <file>` (`uv run` brings
+Playwright from the script header; use `python3` where uv is missing). It replaces each block
 with inline SVG (a light and a dark copy, switched by CSS, coloured from the page's body
 background, body text colour, `--accent` — or the first heading's colour — and body font), keeps
 the source inside the figure, and drops the loader — so diagrams show with no JavaScript or
@@ -106,7 +107,7 @@ phone.
 - Use the `dataviz` skill if this environment has it; otherwise follow SKILL.md section 4.
 
 ## Before replying
-- After `render-mermaid.py`, run `python3 ${CLAUDE_SKILL_DIR}/scripts/check-page.py <file>`
+- After `render-mermaid.py`, run `uv run ${CLAUDE_SKILL_DIR}/scripts/check-page.py <file>`
   once. It renders desktop and phone widths in light and dark and lists overflow, console
   errors, failed loads, unrendered Mermaid, an inert dark theme, low-contrast text and loads
   that break the rules above. Fix what it lists in one pass; don't loop on re-checks — whatever
